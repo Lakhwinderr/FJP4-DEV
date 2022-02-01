@@ -10,6 +10,12 @@ const path = require('path')
 let input = process.argv.slice(2); //argv stands for argument values
 let command = input[0];
 
+let types = {
+media: ["mp4", "mkv", "mp3", 'jpeg', 'png'],
+archives: ["zip", "7z", "rar", "tar", "gz", "ar", "iso", "xz"],
+documents: ["docx","doc","pdf","xlsx","xls","odt","ods","odp","odg","odf","txt","ps","tex",],
+app: ["exe", "dmg", "pkg", "deb"],
+}
 
 switch (command) {
   case "tree":
@@ -67,8 +73,45 @@ function organizeHelper(src, dest){
       let childAddress = path.join(src, childNames[i])
       isFile = fs.lstatSync(childAddress).isFile()
       if(isFile){
-        console.log(childAddress + ' ' + isFile)
+        let fileCategory = getCategory(childNames[i])
+        console.log(childNames[i] + ' belongs to ' + fileCategory)
+        sendFiles(childAddress, dest, fileCategory)
       }
     }
 }
+
+function getCategory(filename){
+    let extName = path.extname(filename).slice(1)
+    //extracted the extensions of the target files
+    // console.log(extName)
+    for(let key in types){
+      let cTypeArray = types[key]
+      //we took out all the category type arrays here
+      // console.log(cTypeArray)
+
+      for(let i = 0; i < cTypeArray.length; i++){
+        if(extName == cTypeArray[i]){
+            return key
+        }
+      }
+    }
+    return 'others'
+
+}
+
+
+function sendFiles(src, dest, category){
+    let catPath = path.join(dest, category)
+    if(fs.existsSync(catPath) == false){
+      fs.mkdirSync(catPath)
+    }
+
+    let fileName = path.basename(src)
+    let destPath = path.join(catPath,fileName)
+    fs.copyFileSync(src, destPath)
+    fs.unlinkSync(src)
+    console.log('Files Organized')
+}
+
+
 //D:\FJP4 dev\TestFolder\organized_Files - we are ready to crearte folder here
