@@ -57,6 +57,18 @@ function organizeFn(dirPath){
     else{
         console.log('Please Enter a valid Path')
     }
+    organizeHelper(dirPath, destPath)
 }
 
+function organizeHelper(src, dest){
+    let childNames = fs.readdirSync(src)
+    // console.log(childNames)
+    for(let i = 0; i < childNames.length; i++){
+      let childAddress = path.join(src, childNames[i])
+      isFile = fs.lstatSync(childAddress).isFile()
+      if(isFile){
+        console.log(childAddress + ' ' + isFile)
+      }
+    }
+}
 //D:\FJP4 dev\TestFolder\organized_Files - we are ready to crearte folder here
